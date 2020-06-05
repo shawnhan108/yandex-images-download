@@ -27,6 +27,8 @@ Example of using keywords from input file with specific image extension/format:
 
 Example of using customized URL:
 ```$ yandex-images-download Chrome -u "https://yandex.com/images/search?cbir_id=3370372%2FA-cR3-LScGHd7DLVKdGt8w&from=tabbar&rpt=imagelike -l 10"```
+or, if installed using CLI:
+```$ yandex-images-download python -m yandex_images_download Chrome -u "https://yandex.com/images/search?cbir_id=3370372%2FA-cR3-LScGHd7DLVKdGt8w&from=tabbar&rpt=imagelike" -l 3```
 
 All other information can be obtained with the `--help` argument.
 
