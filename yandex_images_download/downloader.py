@@ -259,7 +259,7 @@ class YandexImagesDownloader():
         return params
 
     def download_images_by_page(self, keyword, page, imgs_count,
-                                sub_directory) -> PageResult:
+                                sub_directory, customURL) -> PageResult:
 
         page_result = PageResult(status=None,
                                  message=None,
@@ -267,7 +267,10 @@ class YandexImagesDownloader():
                                  errors_count=None,
                                  img_url_results=[])
 
-        self.check_captcha_and_get(YandexImagesDownloader.MAIN_URL,
+        if (customURL):
+            self.check_captcha_and_get(YandexImagesDownloader.MAIN_URL, customURL=customURL)
+        else:
+            self.check_captcha_and_get(YandexImagesDownloader.MAIN_URL,
                                    params=self.get_url_params(page, keyword))
 
         response = self.get_response()
@@ -320,15 +323,17 @@ class YandexImagesDownloader():
 
         return page_result
 
-    def download_images_by_keyword(self, keyword,
+    def download_images_by_keyword(self, keyword, customURL,
                                    sub_directory="") -> KeywordResult:
         keyword_result = KeywordResult(status=None,
                                        message=None,
                                        keyword=keyword,
                                        errors_count=None,
                                        page_results=[])
-
-        self.check_captcha_and_get(YandexImagesDownloader.MAIN_URL,
+        if (customURL):
+            self.check_captcha_and_get(YandexImagesDownloader.MAIN_URL, customURL=customURL)
+        else:
+            self.check_captcha_and_get(YandexImagesDownloader.MAIN_URL,
                                    params={
                                        'text': keyword,
                                        "nomisspell": 1
@@ -376,7 +381,8 @@ class YandexImagesDownloader():
 
             page_result = self.download_images_by_page(keyword, page,
                                                        imgs_count,
-                                                       sub_directory)
+                                                       sub_directory, 
+                                                       customURL)
             keyword_result.page_results.append(page_result)
 
             imgs_count += len(page_result.img_url_results)
@@ -390,7 +396,7 @@ class YandexImagesDownloader():
 
         return keyword_result
 
-    def download_images(self, keywords: List[str]) -> DownloaderResult:
+    def download_images(self, keywords: List[str], customURL="") -> DownloaderResult:
         dowloader_result = DownloaderResult(status=None,
                                             message=None,
                                             keyword_results=[])
@@ -401,10 +407,17 @@ class YandexImagesDownloader():
             logging.info(f"Downloading images for {keyword}...")
 
             keyword_result = self.download_images_by_keyword(
-                keyword, sub_directory=keyword)
+                keyword, customURL=customURL, sub_directory=keyword)
             dowloader_result.keyword_results.append(keyword_result)
 
             logging.info(keyword_result.message)
+
+        if (customURL):
+            logging.info(f"Downloading images for under URL {customURL}...")
+
+            keyword_result = self.download_images_by_keyword(
+                "", customURL=customURL)
+            dowloader_result.keyword_results.append(keyword_result)
 
         dowloader_result.status = "success"
         dowloader_result.message = "Everything is downloaded!"
@@ -414,11 +427,14 @@ class YandexImagesDownloader():
     class StopCaptchaInput(Exception):
         pass
 
-    def check_captcha_and_get(self, url, params=None):
+    def check_captcha_and_get(self, url, customURL=None, params=None):
         """Checking for captcha on url and get url after that.
         If there is captcha, you have to type it in input() or quit."""
 
-        url_with_params = f"{url}?{urlencode(params)}"
+        if (customURL):
+            url_with_params = customURL
+        else:
+            url_with_params = f"{url}?{urlencode(params)}"
 
         del self.driver.requests
         self.driver.get(url_with_params)

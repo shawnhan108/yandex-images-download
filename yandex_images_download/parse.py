@@ -5,7 +5,7 @@ from .downloader import DRIVER_NAME_TO_CLASS
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group = parser.add_mutually_exclusive_group(required=False)
 
     parser.add_argument("browser",
                         help=("browser with WebDriver"),
@@ -29,6 +29,12 @@ def parse_args():
                              "--keywords-from-file",
                              help=("extract list of keywords from a text file. "
                                    "one line = one keyword."),
+                             type=str,
+                             default=None)
+    
+    input_group.add_argument("-u",
+                             "--customURL",
+                             help=("customized Yandex Images URL"),
                              type=str,
                              default=None)
 

@@ -10,6 +10,10 @@ from .parse import parse_args
 
 def scrap(args):
     keywords = []
+    customURL = ""
+
+    if args.customURL:
+        customURL = args.customURL
 
     if args.keywords:
         keywords.extend([
@@ -35,7 +39,12 @@ def scrap(args):
         start_time = time.time()
         total_errors = 0
 
-        if keywords:
+        if customURL:
+            downloader_result = downloader.download_images("", customURL=customURL)
+            total_errors += sum(
+                keyword_result.errors_count
+                for keyword_result in downloader_result.keyword_results)
+        elif keywords:
             downloader_result = downloader.download_images(keywords)
             total_errors += sum(
                 keyword_result.errors_count
